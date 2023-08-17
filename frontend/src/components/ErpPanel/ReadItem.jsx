@@ -1,22 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import { Divider } from 'antd';
+import React, { useState, useEffect, useRef } from "react";
+import { Divider } from "antd";
 
-import { Button, PageHeader, Row, Col, Descriptions, Statistic, Tag } from 'antd';
-import { EditOutlined, FilePdfOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import {
+  Button,
+  PageHeader,
+  Row,
+  Col,
+  Descriptions,
+  Statistic,
+  Tag,
+} from "antd";
+import {
+  EditOutlined,
+  FilePdfOutlined,
+  RollbackOutlined,
+  PlusCircleOutlined,
+} from "@ant-design/icons";
 
-import { useSelector, useDispatch } from 'react-redux';
-import { erp } from '@/redux/erp/actions';
+import { useSelector, useDispatch } from "react-redux";
+import { erp } from "@/redux/erp/actions";
 
-import { useErpContext } from '@/context/erp';
-import uniqueId from '@/utils/uinqueId';
+import { useErpContext } from "@/context/erp";
+import uniqueId from "@/utils/uinqueId";
 
-import { selectCurrentItem } from '@/redux/erp/selectors';
+import { selectCurrentItem, selectItemById } from "@/redux/erp/selectors";
 
-import { DOWNLOAD_BASE_URL } from '@/config/serverApiConfig';
-import { useMoney } from '@/settings';
+import { valueByString } from "@/utils/helpers";
+import { DOWNLOAD_BASE_URL } from "@/config/serverApiConfig";
 
 const Item = ({ item }) => {
-  const { moneyFormatter } = useMoney();
+  console.info("item item : ", item);
   return (
     <Row gutter={[12, 0]} key={item._id}>
       <Col className="gutter-row" span={11}>
@@ -28,16 +41,16 @@ const Item = ({ item }) => {
       <Col className="gutter-row" span={4}>
         <p
           style={{
-            textAlign: 'right',
+            textAlign: "right",
           }}
         >
-          {moneyFormatter({ amount: item.price })}
+          {item.price.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
         </p>
       </Col>
       <Col className="gutter-row" span={4}>
         <p
           style={{
-            textAlign: 'right',
+            textAlign: "right",
           }}
         >
           {item.quantity}
@@ -46,11 +59,11 @@ const Item = ({ item }) => {
       <Col className="gutter-row" span={5}>
         <p
           style={{
-            textAlign: 'right',
-            fontWeight: '700',
+            textAlign: "right",
+            fontWeight: "700",
           }}
         >
-          {moneyFormatter({ amount: item.total })}
+          {item.total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
         </p>
       </Col>
       <Divider dashed style={{ marginTop: 0, marginBottom: 15 }} />
@@ -62,20 +75,20 @@ export default function ReadItem({ config }) {
   const { entity, ENTITY_NAME } = config;
   const dispatch = useDispatch();
   const { erpContextAction } = useErpContext();
-  const { moneyFormatter } = useMoney();
 
   const { result: currentResult } = useSelector(selectCurrentItem);
+  const { state } = useErpContext();
 
   const { readPanel, updatePanel } = erpContextAction;
 
   const [itemslist, setItemsList] = useState([]);
   const [currentErp, setCurrentErp] = useState({
-    status: '',
+    status: "",
     client: {
-      company: '',
-      email: '',
-      phone: '',
-      address: '',
+      company: "",
+      email: "",
+      phone: "",
+      address: "",
     },
     subTotal: 0,
     taxTotal: 0,
@@ -96,31 +109,24 @@ export default function ReadItem({ config }) {
   }, [currentResult]);
 
   useEffect(() => {
-    console.info('itemslist', itemslist);
+    console.info("itemslist", itemslist);
   }, [itemslist]);
 
   return (
     <>
       <PageHeader
         onBack={() => readPanel.close()}
-        title={`${ENTITY_NAME} # ${currentErp.number}/${currentErp.year || ''}`}
+        title={`${ENTITY_NAME} # ${currentErp.number}/${currentErp.year || ""}`}
         ghost={false}
-        tags={<Tag color="volcano">{currentErp.paymentStatus || currentErp.status}</Tag>}
+        tags={<Tag color="volcano">Draft</Tag>}
         // subTitle="This is cuurent erp page"
         extra={[
-          <Button
-            key={`${uniqueId()}`}
-            onClick={() => readPanel.close()}
-            icon={<CloseCircleOutlined />}
-          >
-            Close
-          </Button>,
           <Button
             key={`${uniqueId()}`}
             onClick={() => {
               window.open(
                 `${DOWNLOAD_BASE_URL}${entity}/${entity}-${currentErp._id}.pdf`,
-                '_blank'
+                "_blank"
               );
             }}
             icon={<FilePdfOutlined />}
@@ -130,12 +136,7 @@ export default function ReadItem({ config }) {
           <Button
             key={`${uniqueId()}`}
             onClick={() => {
-              dispatch(
-                erp.currentAction({
-                  actionType: 'update',
-                  data: currentErp,
-                })
-              );
+              dispatch(erp.currentAction("update", currentErp));
               updatePanel.open();
             }}
             type="primary"
@@ -145,39 +146,48 @@ export default function ReadItem({ config }) {
           </Button>,
         ]}
         style={{
-          padding: '20px 0px',
+          padding: "20px 0px",
         }}
       >
         <Row>
           <Statistic title="Status" value={currentErp.status} />
           <Statistic
             title="SubTotal"
-            value={moneyFormatter({ amount: currentErp.subTotal })}
+            prefix="$"
+            value={currentErp.subTotal}
             style={{
-              margin: '0 32px',
+              margin: "0 32px",
             }}
           />
           <Statistic
             title="Total"
-            value={moneyFormatter({ amount: currentErp.total })}
+            prefix="$"
+            value={currentErp.total}
             style={{
-              margin: '0 32px',
+              margin: "0 32px",
             }}
           />
           <Statistic
             title="Balance"
-            value={moneyFormatter({ amount: currentErp.credit })}
+            prefix="$"
+            value={currentErp.credit}
             style={{
-              margin: '0 32px',
+              margin: "0 32px",
             }}
           />
         </Row>
       </PageHeader>
       <Divider dashed />
       <Descriptions title={`Client : ${currentErp.client.company}`}>
-        <Descriptions.Item label="Address">{currentErp.client.address}</Descriptions.Item>
-        <Descriptions.Item label="E-mail">{currentErp.client.email}</Descriptions.Item>
-        <Descriptions.Item label="Phone">{currentErp.client.phone}</Descriptions.Item>
+        <Descriptions.Item label="Address">
+          {currentErp.client.address}
+        </Descriptions.Item>
+        <Descriptions.Item label="E-mail">
+          {currentErp.client.email}
+        </Descriptions.Item>
+        <Descriptions.Item label="Phone">
+          {currentErp.client.phone}
+        </Descriptions.Item>
       </Descriptions>
       <Divider />
       <Row gutter={[12, 0]}>
@@ -189,7 +199,7 @@ export default function ReadItem({ config }) {
         <Col className="gutter-row" span={4}>
           <p
             style={{
-              textAlign: 'right',
+              textAlign: "right",
             }}
           >
             <strong>PRICE</strong>
@@ -198,7 +208,7 @@ export default function ReadItem({ config }) {
         <Col className="gutter-row" span={4}>
           <p
             style={{
-              textAlign: 'right',
+              textAlign: "right",
             }}
           >
             <strong>QUANTITY</strong>
@@ -207,7 +217,7 @@ export default function ReadItem({ config }) {
         <Col className="gutter-row" span={5}>
           <p
             style={{
-              textAlign: 'right',
+              textAlign: "right",
             }}
           >
             <strong>TOTAL</strong>
@@ -220,10 +230,10 @@ export default function ReadItem({ config }) {
       ))}
       <div
         style={{
-          width: '300px',
-          float: 'right',
-          textAlign: 'right',
-          fontWeight: '700',
+          width: "300px",
+          float: "right",
+          textAlign: "right",
+          fontWeight: "700",
         }}
       >
         <Row gutter={[12, -5]}>
@@ -232,19 +242,34 @@ export default function ReadItem({ config }) {
           </Col>
 
           <Col className="gutter-row" span={12}>
-            <p>{moneyFormatter({ amount: currentErp.subTotal })}</p>
+            <p>
+              {`$ `}
+              {currentErp.subTotal
+                .toFixed(2)
+                .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+            </p>
           </Col>
           <Col className="gutter-row" span={12}>
             <p>Tax Total ({currentErp.taxRate * 100} %) :</p>
           </Col>
           <Col className="gutter-row" span={12}>
-            <p>{moneyFormatter({ amount: currentErp.taxTotal })}</p>
+            <p>
+              {`$ `}
+              {currentErp.taxTotal
+                .toFixed(2)
+                .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+            </p>
           </Col>
           <Col className="gutter-row" span={12}>
             <p>Total :</p>
           </Col>
           <Col className="gutter-row" span={12}>
-            <p>{moneyFormatter({ amount: currentErp.total })}</p>
+            <p>
+              {`$ `}
+              {currentErp.total
+                .toFixed(2)
+                .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+            </p>
           </Col>
         </Row>
       </div>

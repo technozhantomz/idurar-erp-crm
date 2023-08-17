@@ -1,22 +1,23 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Route, Redirect } from 'react-router-dom';
+import React from "react";
+import { motion } from "framer-motion";
+import { Route, Redirect } from "react-router-dom";
+
+import * as authService from "@/auth";
 
 const PrivateRoute = ({ component: Component, ...rest }) => {
   const config = {
-    type: 'spring',
+    type: "spring",
     damping: 20,
     stiffness: 100,
   };
-
   return (
-    // Show the component only when the admin is logged in
-    // Otherwise, redirect the admin to /signin page
+    // Show the component only when the user is logged in
+    // Otherwise, redirect the user to /signin page
 
     <Route
       {...rest}
       render={(props) =>
-        window.localStorage.getItem('isLoggedIn') ? (
+        authService.token.get() ? (
           <motion.div
             transition={config}
             initial={{ y: 20, opacity: 0 }}

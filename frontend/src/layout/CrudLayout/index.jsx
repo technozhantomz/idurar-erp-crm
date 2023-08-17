@@ -1,56 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React from "react";
 
-import DefaultLayout from '../DefaultLayout';
+import DefaultLayout from "../DefaultLayout";
+import HeaderContent from "../HeaderContent";
 
-import SidePanel from '@/components/SidePanel';
-import { Layout } from 'antd';
-import { useCrudContext } from '@/context/crud';
-import { useAppContext } from '@/context/appContext';
+import SidePanel from "@/components/SidePanel";
+import { Layout } from "antd";
 
 const { Content } = Layout;
-
-const ContentBox = ({ children }) => {
-  const { state: stateCrud, crudContextAction } = useCrudContext();
-  const { state: stateApp } = useAppContext();
-  const { isPanelClose } = stateCrud;
-  const { isNavMenuClose } = stateApp;
-  const { panel } = crudContextAction;
-
-  const [isSidePanelClose, setSidePanel] = useState(isPanelClose);
-
-  useEffect(() => {
-    let timer = [];
-    if (isPanelClose) {
-      timer = setTimeout(() => {
-        setSidePanel(isPanelClose);
-      }, 200);
-    } else {
-      setSidePanel(isPanelClose);
-    }
-
-    return () => clearTimeout(timer);
-  }, [isPanelClose]);
-
-  useEffect(() => {
-    if (!isNavMenuClose) {
-      panel.close();
-    }
-  }, [isNavMenuClose]);
-  return (
-    <Content
-      className="whiteBox shadow"
-      style={{
-        padding: '50px 40px',
-        margin: '100px auto',
-        width: isSidePanelClose ? '100%' : '830px',
-        maxWidth: '1000px',
-        flex: 'none',
-      }}
-    >
-      {children}
-    </Content>
-  );
-};
 
 export default function CrudLayout({
   children,
@@ -60,20 +16,29 @@ export default function CrudLayout({
   fixHeaderPanel,
 }) {
   return (
-    <>
-      <DefaultLayout>
-        <Layout style={{ minHeight: '100vh' }}>
-          <SidePanel
-            config={config}
-            topContent={sidePanelTopContent}
-            bottomContent={sidePanelBottomContent}
-            fixHeaderPanel={fixHeaderPanel}
-          ></SidePanel>
-          <Layout>
-            <ContentBox> {children}</ContentBox>
-          </Layout>
+    <DefaultLayout>
+      <Layout style={{ minHeight: "100vh" }}>
+        <SidePanel
+          config={config}
+          topContent={sidePanelTopContent}
+          bottomContent={sidePanelBottomContent}
+          fixHeaderPanel={fixHeaderPanel}
+        ></SidePanel>
+        <Layout className="site-layout">
+          <HeaderContent />
+          <Content
+            className="site-layout-background"
+            style={{
+              padding: "50px 40px",
+              margin: "50px auto",
+              width: "100%",
+              maxWidth: "1000px",
+            }}
+          >
+            {children}
+          </Content>
         </Layout>
-      </DefaultLayout>
-    </>
+      </Layout>
+    </DefaultLayout>
   );
 }

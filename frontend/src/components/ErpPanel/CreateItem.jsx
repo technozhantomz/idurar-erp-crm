@@ -1,32 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Divider } from 'antd';
+import React, { useState, useEffect } from "react";
+import { Form, Divider } from "antd";
 
-import { Button, PageHeader, Row, Statistic, Tag } from 'antd';
+import { Button, PageHeader, Row, Statistic, Tag } from "antd";
 
-import { useSelector, useDispatch } from 'react-redux';
-import { erp } from '@/redux/erp/actions';
-import { selectCreatedItem } from '@/redux/erp/selectors';
+import { useSelector, useDispatch } from "react-redux";
+import { erp } from "@/redux/erp/actions";
+import { selectCreatedItem } from "@/redux/erp/selectors";
 
-import { useErpContext } from '@/context/erp';
-import uniqueId from '@/utils/uinqueId';
+import { useErpContext } from "@/context/erp";
+import uniqueId from "@/utils/uinqueId";
 
-import Loading from '@/components/Loading';
-import { CloseCircleOutlined, PlusOutlined } from '@ant-design/icons';
-
-function SaveForm({ form, config }) {
-  let { CREATE_ENTITY } = config;
+import ErpForm from "./ErpForm";
+import Loading from "@/components/Loading";
+import { CloseCircleOutlined, PlusOutlined } from "@ant-design/icons";
+function SaveForm({ form }) {
   const handelClick = () => {
     form.submit();
   };
 
   return (
     <Button onClick={handelClick} type="primary" icon={<PlusOutlined />}>
-      {CREATE_ENTITY}
+      Save Erp
     </Button>
   );
 }
 
-export default function CreateItem({ config, CreateForm }) {
+export default function CreateItem({ config }) {
   let { entity, CREATE_ENTITY } = config;
   const { erpContextAction } = useErpContext();
   const { createPanel } = erpContextAction;
@@ -35,14 +34,14 @@ export default function CreateItem({ config, CreateForm }) {
   const [form] = Form.useForm();
   const [subTotal, setSubTotal] = useState(0);
   const handelValuesChange = (changedValues, values) => {
-    const items = values['items'];
+    const items = values["items"];
     let subTotal = 0;
 
     if (items) {
       items.map((item) => {
         if (item) {
           if (item.quantity && item.price) {
-            let total = item['quantity'] * item['price'];
+            let total = item["quantity"] * item["price"];
             //sub total
             subTotal += total;
           }
@@ -55,29 +54,29 @@ export default function CreateItem({ config, CreateForm }) {
   useEffect(() => {
     if (isSuccess) {
       form.resetFields();
-      dispatch(erp.resetAction({ actionType: 'create' }));
+      dispatch(erp.resetAction("create"));
       setSubTotal(0);
       createPanel.close();
-      dispatch(erp.list({ entity }));
+      dispatch(erp.list(entity));
     }
   }, [isSuccess]);
 
   const onSubmit = (fieldsValue) => {
     if (fieldsValue) {
-      // if (fieldsValue.expiredDate) {
-      //   const newDate = fieldsValue["expiredDate"].format("DD/MM/YYYY");
-      //   fieldsValue = {
-      //     ...fieldsValue,
-      //     expiredDate: newDate,
-      //   };
-      // }
-      // if (fieldsValue.date) {
-      //   const newDate = fieldsValue["date"].format("DD/MM/YYYY");
-      //   fieldsValue = {
-      //     ...fieldsValue,
-      //     date: newDate,
-      //   };
-      // }
+      if (fieldsValue.expiredDate) {
+        const newDate = fieldsValue["expiredDate"].format("DD/MM/YYYY");
+        fieldsValue = {
+          ...fieldsValue,
+          expiredDate: newDate,
+        };
+      }
+      if (fieldsValue.date) {
+        const newDate = fieldsValue["date"].format("DD/MM/YYYY");
+        fieldsValue = {
+          ...fieldsValue,
+          date: newDate,
+        };
+      }
       if (fieldsValue.items) {
         let newList = [...fieldsValue.items];
         newList.map((item) => {
@@ -89,7 +88,7 @@ export default function CreateItem({ config, CreateForm }) {
         };
       }
     }
-    dispatch(erp.create({ entity, jsonData: fieldsValue }));
+    dispatch(erp.create(entity, fieldsValue));
   };
 
   return (
@@ -108,16 +107,39 @@ export default function CreateItem({ config, CreateForm }) {
           >
             Cancel
           </Button>,
-          <SaveForm form={form} config={config} key={`${uniqueId()}`} />,
+          <SaveForm form={form} key={`${uniqueId()}`} />,
         ]}
         style={{
-          padding: '20px 0px',
+          padding: "20px 0px",
         }}
-      ></PageHeader>
+      >
+        <Row>
+          <Statistic title="Status" value="Pending" />
+          <Statistic
+            title="Price"
+            prefix="$"
+            value={568.08}
+            style={{
+              margin: "0 32px",
+            }}
+          />
+          <Statistic title="Balance" prefix="$" value={3345.08} />
+        </Row>
+      </PageHeader>
       <Divider dashed />
       <Loading isLoading={isLoading}>
-        <Form form={form} layout="vertical" onFinish={onSubmit} onValuesChange={handelValuesChange}>
-          <CreateForm subTotal={subTotal} />
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onSubmit}
+          onValuesChange={handelValuesChange}
+        >
+          <ErpForm subTotal={subTotal} />
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Save
+            </Button>
+          </Form.Item>
         </Form>
       </Loading>
     </>

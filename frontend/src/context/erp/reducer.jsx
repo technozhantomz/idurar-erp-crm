@@ -1,4 +1,4 @@
-import * as actionTypes from './types';
+import * as actionTypes from "./types";
 
 export const initialState = {
   create: {
@@ -10,16 +10,12 @@ export const initialState = {
   read: {
     isOpen: false,
   },
-  recordPayment: {
-    isOpen: false,
-  },
   deleteModal: {
     isOpen: false,
   },
-  dataTableList: {
+  listDataTable: {
     isOpen: true,
   },
-  last: null,
 };
 
 export function contextReducer(state, action) {
@@ -38,7 +34,7 @@ export function contextReducer(state, action) {
     case actionTypes.OPEN_PANEL:
       return {
         ...initialState,
-        dataTableList: {
+        listDataTable: {
           isOpen: false,
         },
         [keyState]: { isOpen: true },

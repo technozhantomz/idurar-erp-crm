@@ -1,4 +1,4 @@
-import * as actionTypes from './types';
+import * as actionTypes from "./types";
 
 const INITIAL_STATE = {
   current: {
@@ -9,8 +9,8 @@ const INITIAL_STATE = {
       items: [],
       pagination: {
         current: 1,
+        // defaultCurrent: 1,
         pageSize: 10,
-        showSizeChanger: false,
         total: 1,
       },
     },
@@ -36,12 +36,6 @@ const INITIAL_STATE = {
     isSuccess: false,
   },
   read: {
-    result: null,
-    current: null,
-    isLoading: false,
-    isSuccess: false,
-  },
-  recordPayment: {
     result: null,
     current: null,
     isLoading: false,

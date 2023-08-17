@@ -1,32 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Divider, Space } from 'antd';
-import dayjs from 'dayjs';
-import { Button, PageHeader, Row, Col, Tag } from 'antd';
+import React, { useState, useEffect } from "react";
+import { Form, Divider } from "antd";
+import dayjs from "dayjs";
+import { Button, PageHeader, Row, Statistic, Tag } from "antd";
 
-import { useSelector, useDispatch } from 'react-redux';
-import { erp } from '@/redux/erp/actions';
+import { useSelector, useDispatch } from "react-redux";
+import { erp } from "@/redux/erp/actions";
 
-import { useErpContext } from '@/context/erp';
-import uniqueId from '@/utils/uinqueId';
-import { selectUpdatedItem } from '@/redux/erp/selectors';
-import Loading from '@/components/Loading';
+import { useErpContext } from "@/context/erp";
+import uniqueId from "@/utils/uinqueId";
+import { selectUpdatedItem } from "@/redux/erp/selectors";
+import Loading from "@/components/Loading";
+import ErpForm from "./ErpForm";
+import { CloseCircleOutlined, PlusOutlined } from "@ant-design/icons";
 
-import { CloseCircleOutlined, PlusOutlined } from '@ant-design/icons';
-
-function SaveForm({ form, config }) {
-  let { UPDATE_ENTITY } = config;
+function SaveForm({ form }) {
   const handelClick = () => {
     form.submit();
   };
 
   return (
     <Button onClick={handelClick} type="primary" icon={<PlusOutlined />}>
-      {UPDATE_ENTITY}
+      Save Erp
     </Button>
   );
 }
 
-export default function UpdateItem({ config, UpdateForm }) {
+export default function UpdateItem({ config }) {
   let { entity, UPDATE_ENTITY } = config;
   const { erpContextAction } = useErpContext();
   const { updatePanel } = erpContextAction;
@@ -34,17 +33,17 @@ export default function UpdateItem({ config, UpdateForm }) {
   const { current, isLoading, isSuccess } = useSelector(selectUpdatedItem);
   const [form] = Form.useForm();
   const [subTotal, setSubTotal] = useState(0);
-  const [autoCompleteValue, setAutoCompleteValue] = useState('');
+  const [autoCompleteValue, setAutoCompleteValue] = useState("");
 
   const handelValuesChange = (changedValues, values) => {
-    const items = values['items'];
+    const items = values["items"];
     let subTotal = 0;
 
     if (items) {
       items.map((item) => {
         if (item) {
           if (item.quantity && item.price) {
-            let total = item['quantity'] * item['price'];
+            let total = item["quantity"] * item["price"];
             //sub total
             subTotal += total;
           }
@@ -56,18 +55,18 @@ export default function UpdateItem({ config, UpdateForm }) {
 
   const onSubmit = (fieldsValue) => {
     if (fieldsValue) {
-      // if (fieldsValue.expiredDate) {
-      //   fieldsValue = {
-      //     ...fieldsValue,
-      //     expiredDate: fieldsValue["expiredDate"].format("DD/MM/YYYY"),
-      //   };
-      // }
-      // if (fieldsValue.date) {
-      //   fieldsValue = {
-      //     ...fieldsValue,
-      //     date: fieldsValue["date"].format("DD/MM/YYYY"),
-      //   };
-      // }
+      if (fieldsValue.expiredDate) {
+        fieldsValue = {
+          ...fieldsValue,
+          expiredDate: fieldsValue["expiredDate"].format("DD/MM/YYYY"),
+        };
+      }
+      if (fieldsValue.date) {
+        fieldsValue = {
+          ...fieldsValue,
+          date: fieldsValue["date"].format("DD/MM/YYYY"),
+        };
+      }
       if (fieldsValue.items) {
         let newList = [...fieldsValue.items];
         newList.map((item) => {
@@ -81,15 +80,19 @@ export default function UpdateItem({ config, UpdateForm }) {
     }
 
     const id = current._id;
-    dispatch(erp.update({ entity, id, jsonData: fieldsValue }));
+    console.log(
+      "🚀 ~ file: UpdateItem.jsx ~ line 88 ~ onSubmit ~ fieldsValue",
+      fieldsValue
+    );
+    dispatch(erp.update(entity, id, fieldsValue));
   };
   useEffect(() => {
     if (isSuccess) {
       form.resetFields();
       setSubTotal(0);
-      dispatch(erp.resetAction({ actionType: 'update' }));
+      dispatch(erp.resetAction("update"));
       updatePanel.close();
-      dispatch(erp.list({ entity }));
+      dispatch(erp.list(entity));
     }
   }, [isSuccess]);
 
@@ -102,10 +105,10 @@ export default function UpdateItem({ config, UpdateForm }) {
       //   current.client = undefined;
       // }
       if (current.date) {
-        current.date = dayjs(current.date);
+        current.date = dayjs(current.date, "DD/MM/YYYY");
       }
       if (current.expiredDate) {
-        current.expiredDate = dayjs(current.expiredDate);
+        current.expiredDate = dayjs(current.expiredDate, "DD/MM/YYYY");
       }
       if (!current.taxRate) {
         current.taxRate = 0;
@@ -124,8 +127,8 @@ export default function UpdateItem({ config, UpdateForm }) {
         onBack={() => updatePanel.close()}
         title={UPDATE_ENTITY}
         ghost={false}
-        // tags={<Tag color="volcano">Draft</Tag>}
-        // subTitle="This is update page"
+        tags={<Tag color="volcano">Draft</Tag>}
+        subTitle="This is update page"
         extra={[
           <Button
             key={`${uniqueId()}`}
@@ -134,16 +137,43 @@ export default function UpdateItem({ config, UpdateForm }) {
           >
             Cancel
           </Button>,
-          <SaveForm config={config} form={form} key={`${uniqueId()}`} />,
+          <SaveForm form={form} key={`${uniqueId()}`} />,
         ]}
         style={{
-          padding: '20px 0px',
+          padding: "20px 0px",
         }}
-      ></PageHeader>
+      >
+        <Row>
+          <Statistic title="Status" value="Pending" />
+          <Statistic
+            title="Price"
+            prefix="$"
+            value={568.08}
+            style={{
+              margin: "0 32px",
+            }}
+          />
+          <Statistic title="Balance" prefix="$" value={3345.08} />
+        </Row>
+      </PageHeader>
       <Divider dashed />
       <Loading isLoading={isLoading}>
-        <Form form={form} layout="vertical" onFinish={onSubmit} onValuesChange={handelValuesChange}>
-          <UpdateForm subTotal={subTotal} current={current} />
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onSubmit}
+          onValuesChange={handelValuesChange}
+        >
+          <ErpForm
+            subTotal={subTotal}
+            // autoCompleteUpdate={autoCompleteValue}
+            current={current}
+          />
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Save
+            </Button>
+          </Form.Item>
         </Form>
       </Loading>
     </>

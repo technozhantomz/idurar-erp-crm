@@ -1,17 +1,22 @@
-import React, { useCallback, useEffect } from 'react';
-import { Dropdown, Table } from 'antd';
-import { Button, PageHeader } from 'antd';
-import { EllipsisOutlined } from '@ant-design/icons';
-import { useSelector, useDispatch } from 'react-redux';
-import { erp } from '@/redux/erp/actions';
-import { settings } from '@/redux/settings/actions';
-import { selectListItems } from '@/redux/erp/selectors';
-import { useErpContext } from '@/context/erp';
-import uniqueId from '@/utils/uinqueId';
-
-import { RedoOutlined, PlusOutlined } from '@ant-design/icons';
+import React, { useCallback, useEffect } from "react";
+import { Dropdown, Menu, Table } from "antd";
+import { Button, PageHeader, Tag } from "antd";
+import {
+  EllipsisOutlined,
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  FilePdfOutlined,
+} from "@ant-design/icons";
+import { useSelector, useDispatch } from "react-redux";
+import { erp } from "@/redux/erp/actions";
+import { selectListItems, selectItemById } from "@/redux/erp/selectors";
+import { useErpContext } from "@/context/erp";
+import uniqueId from "@/utils/uinqueId";
+import { DOWNLOAD_BASE_URL } from "@/config/serverApiConfig";
+import { RedoOutlined, PlusOutlined } from "@ant-design/icons";
 function AddNewItem({ config }) {
-  const { ADD_NEW_ENTITY } = config;
+  const { ADD_NEW_ENTITY, DATATABLE_TITLE } = config;
   const { erpContextAction } = useErpContext();
   const { createPanel } = erpContextAction;
   const handelClick = () => {
@@ -24,39 +29,79 @@ function AddNewItem({ config }) {
     </Button>
   );
 }
+function DropDownRowMenu({ row, entity }) {
+  const dispatch = useDispatch();
+  const { erpContextAction } = useErpContext();
+  const { readPanel, updatePanel, modal } = erpContextAction;
+  const item = useSelector(selectItemById(row._id));
+  const Show = () => {
+    dispatch(erp.currentItem(item));
+    readPanel.open();
+  };
+  function Edit() {
+    dispatch(erp.currentAction("update", item));
+    updatePanel.open();
+  }
+  function Delete() {
+    dispatch(erp.currentAction("delete", item));
+    modal.open();
+  }
+  function Download() {
+    window.open(
+      `${DOWNLOAD_BASE_URL}${entity}/${entity}-${row._id}.pdf`,
+      "_blank"
+    );
+  }
+  return (
+    <Menu style={{ width: 130 }}>
+      <Menu.Item icon={<EyeOutlined />} onClick={Show}>
+        Show
+      </Menu.Item>
+      <Menu.Item icon={<EditOutlined />} onClick={Edit}>
+        Edit
+      </Menu.Item>
+      <Menu.Item icon={<FilePdfOutlined />} onClick={Download}>
+        Download
+      </Menu.Item>
+      <Menu.Item icon={<DeleteOutlined />} onClick={Delete}>
+        Delete
+      </Menu.Item>
+    </Menu>
+  );
+}
 
-export default function DataTable({ config, DataTableDropMenu }) {
+export default function DataTable({ config }) {
   let { entity, dataTableColumns } = config;
   const { DATATABLE_TITLE } = config;
   dataTableColumns = [
     ...dataTableColumns,
     {
-      title: '',
+      title: "",
       render: (row) => (
-        <Dropdown overlay={DataTableDropMenu({ row, entity })} trigger={['click']}>
-          <EllipsisOutlined style={{ cursor: 'pointer', fontSize: '24px' }} />
+        <Dropdown
+          overlay={DropDownRowMenu({ row, entity })}
+          trigger={["click"]}
+        >
+          <EllipsisOutlined style={{ cursor: "pointer", fontSize: "24px" }} />
         </Dropdown>
       ),
     },
   ];
 
-  const { result: listResult, isLoading: listIsLoading } = useSelector(selectListItems);
+  const { result: listResult, isLoading: listIsLoading } = useSelector(
+    selectListItems
+  );
 
   const { pagination, items } = listResult;
 
   const dispatch = useDispatch();
 
   const handelDataTableLoad = useCallback((pagination) => {
-    const options = { page: pagination.current || 1 };
-    dispatch(erp.list({ entity, options }));
+    dispatch(erp.list(entity, pagination.current));
   }, []);
 
-  // const handelCurrency = () => {
-  //   dispatch(settings.currency({ value: '€' }));
-  //   dispatch(settings.currencyPosition({ position: 'before' }));
-  // };
   useEffect(() => {
-    dispatch(erp.list({ entity }));
+    dispatch(erp.list(entity));
   }, []);
 
   return (
@@ -65,16 +110,17 @@ export default function DataTable({ config, DataTableDropMenu }) {
         title={DATATABLE_TITLE}
         ghost={true}
         extra={[
-          <Button onClick={handelDataTableLoad} key={`${uniqueId()}`} icon={<RedoOutlined />}>
+          <Button
+            onClick={handelDataTableLoad}
+            key={`${uniqueId()}`}
+            icon={<RedoOutlined />}
+          >
             Refresh
           </Button>,
-          // <Button onClick={handelCurrency} key={`${uniqueId()}`} icon={<RedoOutlined />}>
-          //   Change Currency
-          // </Button>,
           <AddNewItem config={config} key={`${uniqueId()}`} />,
         ]}
         style={{
-          padding: '20px 0px',
+          padding: "20px 0px",
         }}
       ></PageHeader>
       <Table

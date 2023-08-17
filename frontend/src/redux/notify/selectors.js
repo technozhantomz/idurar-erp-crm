@@ -1,10 +1,13 @@
-import { createSelector } from 'reselect';
+import { createSelector } from "reselect";
 
-const selectAdmin = (state) => state.admin;
+const selectUser = (state) => state.user;
 
-export const selectCurrentAdmin = createSelector([selectAdmin], (admin) => admin.currentAdmin);
-export const selectDisplayName = createSelector(
-  [selectCurrentAdmin],
-  (currentAdmin) => currentAdmin.displayName
+export const selectCurrentUser = createSelector(
+  [selectUser],
+  (user) => user.currentUser
 );
-export const SelectHidden = createSelector([selectAdmin], (admin) => admin.hidden);
+export const selectDisplayName = createSelector(
+  [selectCurrentUser],
+  (currentUser) => currentUser.displayName
+);
+export const SelectHidden = createSelector([selectUser], (user) => user.hidden);

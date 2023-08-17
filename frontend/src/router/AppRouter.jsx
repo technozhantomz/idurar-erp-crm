@@ -1,30 +1,31 @@
-import React, { lazy, Suspense } from 'react';
-import { Redirect, Route, Switch, useLocation } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
-import PrivateRoute from './PrivateRoute';
-import PublicRoute from './PublicRoute';
-import PageLoader from '@/components/PageLoader';
-import { routesConfig } from './RoutesConfig';
+import React, { lazy, Suspense } from "react";
+import { Redirect, Route, Switch, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
+import PrivateRoute from "./PrivateRoute";
+import PublicRoute from "./PublicRoute";
+import PageLoader from "@/components/PageLoader";
 
-const Logout = lazy(() => import(/*webpackChunkName:'LogoutPage'*/ '@/pages/Logout'));
-const NotFound = lazy(() => import(/*webpackChunkName:'NotFoundPage'*/ '@/pages/NotFound'));
+const Dashboard = lazy(() =>
+  import(/*webpackChunkName:'DashboardPage'*/ "@/pages/Dashboard")
+);
+const User = lazy(() => import(/*webpackChunkName:'UserPage'*/ "@/pages/User"));
 
-const SubMenuRouter = ({ subMenuRouter }) => {
-  subMenuRouter.map((subMenu) => {
-    console.log('🚀 ~ file: AppRouter.jsx ~ line 25 ~ routeItem.hasSubMenu.map ~ subMenu', subMenu);
+const Customer = lazy(() =>
+  import(/*webpackChunkName:'CustomerPage'*/ "@/pages/Customer")
+);
+const Invoice = lazy(() =>
+  import(/*webpackChunkName:'InvoicePage'*/ "@/pages/Invoice")
+);
+const Quote = lazy(() =>
+  import(/*webpackChunkName:'QuotePage'*/ "@/pages/Quote")
+);
 
-    return (
-      <PrivateRoute
-        key={subMenu.component}
-        path={subMenu.path}
-        exact={subMenu.exact || true}
-        component={lazy(() =>
-          import(/* webpackChunkName: "[request]" */ `@/pages/${subMenu.component}`)
-        )}
-      />
-    );
-  });
-};
+const Logout = lazy(() =>
+  import(/*webpackChunkName:'LogoutPage'*/ "@/pages/Logout")
+);
+const NotFound = lazy(() =>
+  import(/*webpackChunkName:'NotFoundPage'*/ "@/pages/NotFound")
+);
 
 export default function AppRouter() {
   const location = useLocation();
@@ -32,21 +33,18 @@ export default function AppRouter() {
     <Suspense fallback={<PageLoader />}>
       <AnimatePresence exitBeforeEnter initial={false}>
         <Switch location={location} key={location.pathname}>
-          {routesConfig.map((routeItem) => {
-            return (
-              <PrivateRoute
-                key={routeItem.component}
-                path={routeItem.path}
-                exact={routeItem.exact || true}
-                component={lazy(() =>
-                  import(/* webpackChunkName: "[request]" */ `@/pages/${routeItem.component}`)
-                )}
-              />
-            );
-          })}
-          <PublicRoute path="/login" render={() => <Redirect to="/" />} exact />
-          <Route component={Logout} path="/logout" exact />
-          <Route path="*" component={NotFound} render={() => <Redirect to="/notfound" />} />
+          <PrivateRoute path="/" component={Dashboard} exact />
+          <PrivateRoute component={Customer} path="/customer" exact />
+          <PrivateRoute component={User} path="/user" exact />
+          <PrivateRoute component={Invoice} path="/invoice" exact />
+          <PrivateRoute component={Quote} path="/quote" exact />
+          <PrivateRoute component={Logout} path="/logout" exact />
+          <PublicRoute path="/login" render={() => <Redirect to="/" />} />
+          <Route
+            path="*"
+            component={NotFound}
+            render={() => <Redirect to="/notfound" />}
+          />
         </Switch>
       </AnimatePresence>
     </Suspense>

@@ -1,68 +1,50 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useState, useRef } from "react";
 
-import { useDebounce } from 'react-use';
-import { Select, Empty } from 'antd';
+import { AutoComplete, Input } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import { useSelector, useDispatch } from "react-redux";
+import { crud } from "@/redux/crud/actions";
+import { request } from "@/request";
+import { useCrudContext } from "@/context/crud";
+import { selectSearchedItems } from "@/redux/crud/selectors";
 
-import { SearchOutlined } from '@ant-design/icons';
-import { useSelector, useDispatch } from 'react-redux';
-import { crud } from '@/redux/crud/actions';
+import { Empty } from "antd";
 
-import { useCrudContext } from '@/context/crud';
-import { selectSearchedItems } from '@/redux/crud/selectors';
-
-function SearchItemComponent({ config, onRerender }) {
+export default function SearchItem({ config }) {
   let { entity, searchConfig } = config;
 
-  const { displayLabels, searchFields, outputValue = '_id' } = searchConfig;
-
+  const { displayLabels, searchFields, outputValue = "_id" } = searchConfig;
   const dispatch = useDispatch();
+  const [value, setValue] = useState("");
+  const [options, setOptions] = useState([]);
+
   const { crudContextAction } = useCrudContext();
   const { panel, collapsedBox, readBox } = crudContextAction;
+
+  let source = request.source();
   const { result, isLoading, isSuccess } = useSelector(selectSearchedItems);
 
-  const [selectOptions, setOptions] = useState([]);
-  const [currentValue, setCurrentValue] = useState(undefined);
+  const isTyping = useRef(false);
 
-  const isSearching = useRef(false);
-
-  const [searching, setSearching] = useState(false);
-
-  const [valToSearch, setValToSearch] = useState('');
-  const [debouncedValue, setDebouncedValue] = useState('');
-
-  const [, cancel] = useDebounce(
-    () => {
-      setDebouncedValue(valToSearch);
-    },
-    500,
-    [valToSearch]
-  );
-
-  const labels = (optionField) => {
-    return displayLabels.map((x) => optionField[x]).join(' ');
-  };
-
+  let delayTimer = null;
   useEffect(() => {
-    if (debouncedValue != '') {
-      const options = {
-        q: debouncedValue,
-        fields: searchFields,
-      };
-      dispatch(crud.search({ entity, options }));
-    }
-    return () => {
-      cancel();
-    };
-  }, [debouncedValue]);
-
+    isLoading && setOptions([{ label: "... Searching" }]);
+  }, [isLoading]);
   const onSearch = (searchText) => {
-    if (searchText && searchText != '') {
-      isSearching.current = true;
-      setSearching(true);
-      setOptions([]);
-      setCurrentValue(undefined);
-      setValToSearch(searchText);
-    }
+    isTyping.current = true;
+
+    clearTimeout(delayTimer);
+    delayTimer = setTimeout(function () {
+      if (isTyping.current && searchText !== "") {
+        dispatch(
+          crud.search(entity, source, {
+            question: searchText,
+            fields: searchFields,
+          })
+        );
+      }
+      isTyping.current = false;
+    }, 500);
   };
 
   const onSelect = (data) => {
@@ -70,57 +52,46 @@ function SearchItemComponent({ config, onRerender }) {
       return item[outputValue] === data;
     });
 
-    dispatch(crud.currentItem({ data: currentItem }));
-
+    dispatch(crud.currentItem(currentItem));
     panel.open();
     collapsedBox.open();
     readBox.open();
-    onRerender();
   };
+
+  const onChange = (data) => {
+    const currentItem = options.find((item) => {
+      return item.value === data;
+    });
+    const currentValue = currentItem ? currentItem.label : data;
+    setValue(currentValue);
+  };
+
   useEffect(() => {
-    if (isSearching.current) {
-      if (isSuccess) {
-        setOptions(result);
-      } else {
-        setSearching(false);
-        setCurrentValue(undefined);
-        setOptions([]);
-      }
-    }
-  }, [isSuccess, result]);
+    let optionResults = [];
+
+    result.map((item) => {
+      const labels = displayLabels.map((x) => item[x]).join(" ");
+      optionResults.push({ label: labels, value: item[outputValue] });
+    });
+
+    setOptions(optionResults);
+  }, [result]);
 
   return (
-    <Select
-      loading={isLoading}
-      showSearch
-      allowClear
-      placeholder={<SearchOutlined style={{ float: 'right', padding: '8px 0' }} />}
-      defaultActiveFirstOption={false}
-      showArrow={false}
-      filterOption={false}
-      notFoundContent={searching ? '... Searching' : <Empty />}
-      value={currentValue}
-      onSearch={onSearch}
-      style={{ width: '100%' }}
+    <AutoComplete
+      value={value}
+      options={options}
+      style={{
+        width: "100%",
+      }}
       onSelect={onSelect}
+      onSearch={onSearch}
+      onChange={onChange}
+      notFoundContent={!isSuccess ? <Empty /> : ""}
+      allowClear={true}
+      placeholder="Your Search here"
     >
-      {selectOptions.map((optionField) => (
-        <Select.Option key={optionField[outputValue]} value={optionField[outputValue]}>
-          {labels(optionField)}
-        </Select.Option>
-      ))}
-    </Select>
+      <Input suffix={<SearchOutlined />} />
+    </AutoComplete>
   );
-}
-
-export default function SearchItem({ config }) {
-  const [state, setState] = useState([0]);
-
-  const onRerender = () => {
-    setState([state + 1]);
-  };
-
-  return state.map((comp) => (
-    <SearchItemComponent key={comp} config={config} onRerender={onRerender} />
-  ));
 }

@@ -1,4 +1,4 @@
-import * as actionTypes from './types';
+import * as actionTypes from "./types";
 
 const contextActions = (dispatch) => {
   return {
@@ -8,22 +8,6 @@ const contextActions = (dispatch) => {
       },
       close: () => {
         dispatch({ type: actionTypes.CLOSE_MODAL });
-      },
-    },
-    advancedBox: {
-      open: () => {
-        dispatch({ type: actionTypes.OPEN_ADVANCED_BOX });
-      },
-      close: () => {
-        dispatch({ type: actionTypes.CLOSE_ADVANCED_BOX });
-      },
-    },
-    editBox: {
-      open: () => {
-        dispatch({ type: actionTypes.OPEN_EDIT_BOX });
-      },
-      close: () => {
-        dispatch({ type: actionTypes.CLOSE_EDIT_BOX });
       },
     },
     panel: {
@@ -51,11 +35,11 @@ const contextActions = (dispatch) => {
     readBox: {
       open: () => {
         dispatch({ type: actionTypes.OPEN_READ_BOX });
-        console.log('readBox open');
+        console.log("readBox open");
       },
       close: () => {
         dispatch({ type: actionTypes.CLOSE_READ_BOX });
-        console.log('readBox close');
+        console.log("readBox close");
       },
       collapse: () => {
         dispatch({ type: actionTypes.COLLAPSE_READ_BOX });

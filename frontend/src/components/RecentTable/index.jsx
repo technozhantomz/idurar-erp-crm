@@ -1,10 +1,14 @@
-import React from 'react';
-import { Dropdown, Menu, Table } from 'antd';
+import React, { useEffect } from "react";
+import { Dropdown, Menu, Table } from "antd";
+import { useQuery } from "react-query";
+import { request } from "@/request";
 
-import { request } from '@/request';
-import useFetch from '@/hooks/useFetch';
-
-import { EllipsisOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import {
+  EllipsisOutlined,
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 
 function DropDownRowMenu({ row }) {
   const Show = () => {};
@@ -30,29 +34,26 @@ export default function RecentTable({ ...props }) {
   dataTableColumns = [
     ...dataTableColumns,
     {
-      title: '',
+      title: "",
       render: (row) => (
-        <Dropdown overlay={DropDownRowMenu({ row })} trigger={['click']}>
-          <EllipsisOutlined style={{ cursor: 'pointer', fontSize: '24px' }} />
+        <Dropdown overlay={DropDownRowMenu({ row })} trigger={["click"]}>
+          <EllipsisOutlined style={{ cursor: "pointer", fontSize: "24px" }} />
         </Dropdown>
       ),
     },
   ];
 
-  const asyncList = () => {
-    return request.list({ entity });
-  };
-  const { result, isLoading, isSuccess } = useFetch(asyncList);
-  const firstFiveItems = () => {
-    if (isSuccess && result) return result.slice(0, 5);
-    return [];
-  };
+  const { isLoading, error, data } = useQuery(entity, () =>
+    request.list(entity)
+  );
+  console.log("use query data", data);
+  useEffect(() => {}, [data]);
   return (
     <>
       <Table
         columns={dataTableColumns}
         rowKey={(item) => item._id}
-        dataSource={isSuccess && firstFiveItems()}
+        dataSource={data && data.result}
         pagination={false}
         loading={isLoading}
       />

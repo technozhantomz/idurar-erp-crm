@@ -1,69 +1,70 @@
-import React from 'react';
+import React from "react";
 
-import CrudModule from '@/modules/CrudModule';
-import CustomerForm from '@/forms/CustomerForm';
+import CrudPanel from "@/components/CrudPanel";
+import CustomerForm from "@/forms/CustomerForm";
 
 function Customer() {
-  const entity = 'client';
+  const entity = "client";
   const searchConfig = {
-    displayLabels: ['company'],
-    searchFields: 'company,managerSurname,managerName',
-    outputValue: '_id',
+    displayLabels: ["company"],
+    searchFields: "company,managerSurname,managerName",
+    outputValue: "_id",
   };
 
-  const entityDisplayLabels = ['company'];
+  const panelTitle = "Customer Panel";
+  const dataTableTitle = "Patients Lists";
+  const entityDisplayLabels = ["company"];
 
   const readColumns = [
     {
-      title: 'Company',
-      dataIndex: 'company',
+      title: "Company",
+      dataIndex: "company",
     },
     {
-      title: 'Manager Surname',
-      dataIndex: 'managerSurname',
+      title: "Manager Surname",
+      dataIndex: "managerSurname",
     },
     {
-      title: 'Manager Name',
-      dataIndex: 'managerName',
+      title: "Manager Name",
+      dataIndex: "managerName",
     },
     {
-      title: 'Email',
-      dataIndex: 'email',
+      title: "Email",
+      dataIndex: "email",
     },
     {
-      title: 'Phone',
-      dataIndex: 'phone',
+      title: "Phone",
+      dataIndex: "phone",
     },
   ];
   const dataTableColumns = [
     {
-      title: 'Company',
-      dataIndex: 'company',
+      title: "Company",
+      dataIndex: "company",
     },
     {
-      title: 'Manager Surname',
-      dataIndex: 'managerSurname',
+      title: "Manager Surname",
+      dataIndex: "managerSurname",
     },
     {
-      title: 'Manager Name',
-      dataIndex: 'managerName',
+      title: "Manager Name",
+      dataIndex: "managerName",
     },
     {
-      title: 'Email',
-      dataIndex: 'email',
+      title: "Email",
+      dataIndex: "email",
     },
   ];
 
-  const ADD_NEW_ENTITY = 'Add new customer';
-  const DATATABLE_TITLE = 'customers List';
-  const ENTITY_NAME = 'customer';
-  const CREATE_ENTITY = 'Create customer';
-  const UPDATE_ENTITY = 'Update customer';
-  const PANEL_TITLE = 'Customer Panel';
-
+  const ADD_NEW_ENTITY = "Add new customer";
+  const DATATABLE_TITLE = "customers List";
+  const ENTITY_NAME = "customer";
+  const CREATE_ENTITY = "Create customer";
+  const UPDATE_ENTITY = "Update customer";
   const config = {
     entity,
-    PANEL_TITLE,
+    panelTitle,
+    dataTableTitle,
     ENTITY_NAME,
     CREATE_ENTITY,
     ADD_NEW_ENTITY,
@@ -75,9 +76,12 @@ function Customer() {
     entityDisplayLabels,
   };
   return (
-    <CrudModule
+    <CrudPanel
+      entity={entity}
+      dataTableColumns={dataTableColumns}
       createForm={<CustomerForm />}
-      updateForm={<CustomerForm isUpdateForm={true} />}
+      readColumns={readColumns}
+      searchConfig={searchConfig}
       config={config}
     />
   );

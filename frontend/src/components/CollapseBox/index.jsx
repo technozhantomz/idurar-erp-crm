@@ -1,5 +1,5 @@
-import React from 'react';
-import { Row, Col } from 'antd';
+import React from "react";
+import { Row, Col } from "antd";
 
 const CollapseBoxButton = ({ onChange, title }) => {
   return (
@@ -10,7 +10,9 @@ const CollapseBoxButton = ({ onChange, title }) => {
 };
 
 const TopCollapseBox = ({ isOpen, children }) => {
-  const show = isOpen ? { display: 'block', opacity: 1 } : { display: 'none', opacity: 0 };
+  const show = isOpen
+    ? { display: "block", opacity: 1 }
+    : { display: "none", opacity: 0 };
   return (
     <div className="TopCollapseBox">
       <div style={show}>
@@ -23,7 +25,9 @@ const TopCollapseBox = ({ isOpen, children }) => {
 };
 
 const BottomCollapseBox = ({ isOpen, children }) => {
-  const show = isOpen ? { display: 'none', opacity: 0 } : { display: 'block', opacity: 1 };
+  const show = isOpen
+    ? { display: "none", opacity: 0 }
+    : { display: "block", opacity: 1 };
   return (
     <div className="BottomCollapseBox">
       <div style={show}>
@@ -41,15 +45,22 @@ export default function CollapseBox({
   buttonTitle,
   isCollapsed,
   onCollapse,
+  isPanelCollapsed,
 }) {
-  const collapsed = isCollapsed ? 'collapsed' : '';
+  const collapsed = isCollapsed ? "collapsed" : "";
+  const isDiplayed = isPanelCollapsed ? "-400px" : "0px";
   return (
-    <div className="panelBox">
+    <div
+      className="panelBox"
+      style={{ width: "400px", marginLeft: isDiplayed }}
+    >
       <TopCollapseBox isOpen={isCollapsed}>{topContent}</TopCollapseBox>
-      <div className={'collapseBox ' + collapsed}>
+      <div className={"collapseBox " + collapsed}>
         <CollapseBoxButton title={buttonTitle} onChange={onCollapse} />
         <div className="whiteBg"></div>
-        <BottomCollapseBox isOpen={isCollapsed}>{bottomContent}</BottomCollapseBox>
+        <BottomCollapseBox isOpen={isCollapsed}>
+          {bottomContent}
+        </BottomCollapseBox>
       </div>
     </div>
   );

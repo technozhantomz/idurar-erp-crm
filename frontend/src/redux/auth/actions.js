@@ -1,37 +1,39 @@
-import * as actionTypes from './types';
-import * as authService from '@/auth';
+import * as actionTypes from "./types";
+import * as authService from "@/auth";
+import storePersist from "@/redux/storePersist";
+import history from "@/utils/history";
 
-import history from '@/utils/history';
+export const login = (loginUserData) => async (dispatch) => {
+  dispatch({
+    type: actionTypes.LOADING_REQUEST,
+    payload: { loading: true },
+  });
+  const data = await authService.login(loginUserData);
 
-export const login =
-  ({ loginData }) =>
-  async (dispatch) => {
+  if (data.success === true) {
+    const authValue = {
+      current: data.result.user,
+      loading: false,
+      isLoggedIn: true,
+    };
+    storePersist.set("auth", authValue);
     dispatch({
-      type: actionTypes.LOADING_REQUEST,
-      payload: { loading: true },
+      type: actionTypes.LOGIN_SUCCESS,
+      payload: data.result.user,
     });
-    const data = await authService.login({ loginData });
-
-    if (data.success === true) {
-      window.localStorage.setItem('isLoggedIn', true);
-      window.localStorage.setItem('auth', JSON.stringify(data.result.admin));
-      dispatch({
-        type: actionTypes.LOGIN_SUCCESS,
-        payload: data.result.admin,
-      });
-      history.push('/');
-    } else {
-      dispatch({
-        type: actionTypes.FAILED_REQUEST,
-        payload: data,
-      });
-    }
-  };
+    history.push("/");
+  } else {
+    dispatch({
+      type: actionTypes.FAILED_REQUEST,
+      payload: data,
+    });
+  }
+};
 
 export const logout = () => async (dispatch) => {
   authService.logout();
   dispatch({
     type: actionTypes.LOGOUT_SUCCESS,
   });
-  history.push('/login');
+  history.push("/login");
 };

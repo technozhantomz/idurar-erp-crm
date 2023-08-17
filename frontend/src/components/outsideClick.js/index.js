@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from "react";
 
-const Dropdown = ({ value, options, placeholder = 'Select', onChange }) => {
+const Dropdown = ({ value, options, placeholder = "Select", onChange }) => {
   const node = useRef();
 
   const [open, setOpen] = useState(false);
@@ -20,10 +20,10 @@ const Dropdown = ({ value, options, placeholder = 'Select', onChange }) => {
   };
 
   useEffect(() => {
-    document.addEventListener('mousedown', handleClick);
+    document.addEventListener("mousedown", handleClick);
 
     return () => {
-      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener("mousedown", handleClick);
     };
   }, [open]);
 
@@ -35,7 +35,10 @@ const Dropdown = ({ value, options, placeholder = 'Select', onChange }) => {
       {open && (
         <ul className="dropdown-menu">
           {options.map((opt) => (
-            <li className="dropdown-menu-item" onClick={(e) => handleChange(opt)}>
+            <li
+              className="dropdown-menu-item"
+              onClick={(e) => handleChange(opt)}
+            >
               {opt}
             </li>
           ))}

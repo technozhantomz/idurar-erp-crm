@@ -1,129 +1,68 @@
-# ERP / CRM Open Source based on (Node.js/React.js)
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-IDURAR is Open Source ERP / CRM (Invoice / Inventory / Accounting / HR) Based on Advanced Mern Stack (Node.js / Express.js / MongoDb / React.js ) with Ant Design (AntD) and Redux
+## Available Scripts
 
-```
-Dont forget to give a ⭐️ to this project ... Happy coding! 🤩
-```
+In the project directory, you can run:
 
-![Open Source ERP / CRM - MERN Stack (Node.js/React.js)](https://user-images.githubusercontent.com/50052356/141647096-dcb66696-6103-4850-ae21-9fc97a412252.png)
-![Open Source ERP / CRM - MERN Stack (Node.js/React.js)](https://user-images.githubusercontent.com/50052356/141647100-9dfd6ee5-f873-42a8-8923-88bd0cf53606.png)
+### `yarn start`
 
-## Open Source ERP / CRM App
+Runs the app in the development mode.<br />
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-IDURAR is Open Source ERP / CRM (Invoice / Inventory / Accounting / HR) Based on Mern Stack (Node.js / Express.js / MongoDb / React.js ) with Ant Design (AntD) and Redux
+The page will reload if you make edits.<br />
+You will also see any lint errors in the console.
 
-**Live App Demo** : [https://idurarapp.com/open-source-erp-crm/](https://idurarapp.com/open-source-erp-crm/) "Please use chrome"
+### `yarn test`
 
-`username : admin@demo.com password : admin123`
+Launches the test runner in the interactive watch mode.<br />
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-## Getting started
+### `yarn build`
 
-#### Step 1: Clone the repository
+Builds the app for production to the `build` folder.<br />
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-```bash
-git clone https://github.com/idurar/idurar-erp-crm.git
-```
+The build is minified and the filenames include the hashes.<br />
+Your app is ready to be deployed!
 
-```bash
-cd idurar-erp-crm
-```
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-#### Step 2: Create Your MongoDB Account and Database/Cluster
+### `yarn eject`
 
-- Create your own MongoDB account by visiting the MongoDB website and signing up for a new account.
+**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-- Create a new database or cluster by following the instructions provided in the MongoDB documentation. Remember to note down the "Connect to your application URI" for the database, as you will need it later. Also, make sure to change `<password>` with your own password
+If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-- add your current IP address to the MongoDB database's IP whitelist to allow connections (this is needed whenever your ip changes)
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
-#### Step 3: Create the Environment File
+You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
-- Create a file named .variables.env in the root directory.
-- Copy all variables from tmp.variables.env .
-- Paste the copied variables inside .variables.env.
-  This file will store environment variables for the project to run.
+## Learn More
 
-#### Step 4: Update MongoDB URI
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-In the .variables.env file, find the line that reads:
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-`DATABASE="your-mongodb-uri"`
+### Code Splitting
 
-Replace "your-mongodb-uri" with the actual URI of your MongoDB database.
+This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
 
-#### Step 5: Install Backend Dependencies
+### Analyzing the Bundle Size
 
-In your terminal, navigate to the root directory of the project and run the following command to install the backend dependencies:
+This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
 
-```bash
-npm install
-```
+### Making a Progressive Web App
 
-This command will install all the required packages specified in the package.json file.
+This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
 
-#### Step 6: Run Setup Script
+### Advanced Configuration
 
-While still in the root directory of the project, execute the following command to run the setup script:
+This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
 
-```bash
-node setup/setup.js
-```
+### Deployment
 
-This setup script may perform necessary database migrations or any other initialization tasks required for the project.
+This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
 
-#### Step 7: Run the Backend Server
+### `yarn build` fails to minify
 
-In the same terminal, run the following command to start the backend server:
-
-```bash
-npm run dev
-```
-
-This command will start the backend server, and it will listen for incoming requests.
-
-#### Step 8: Install Frontend Dependencies
-
-Open a new terminal window , and run the following command to install the frontend dependencies:
-
-```bash
-cd frontend
-```
-
-```bash
-npm install
-```
-
-This command will navigate to the frontend directory within the project and install all the required packages for the frontend.
-
-#### Step 9: Run the Frontend Server
-
-After installing the frontend dependencies, run the following command in the same terminal to start the frontend server:
-
-```bash
-npm run start
-```
-
-This command will start the frontend server, and you'll be able to access the website on localhost:3000 in your web browser.
-
-:exclamation: :warning:` If you encounter an OpenSSL error while running the frontend server, follow these additional steps:`
-
-```bash
-export NODE_OPTIONS=--openssl-legacy-provider
-```
-
-```bash
-npm run start
-```
-
-### Website Login Credentials
-
-Once the website is up and running, you can log in using the following credentials:
-
-`username : admin@demo.com password : admin123`
-
-Now you should be all set to run the project locally on your machine and explore its features.
-
-## Show your support
-
-Dont forget to give a ⭐️ to this project ... Happy coding!
+This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
